@@ -9,7 +9,11 @@ import {
   Platform,
   ScrollView,
   Alert,
+  StatusBar,
 } from 'react-native';
+// Standard CLI vector icons
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import { COLORS } from '@/utils/constants';
 import { useAuth } from '@/context/AuthContext';
 
@@ -18,6 +22,8 @@ export const LoginScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+
   const { signIn, signUp, googleSignIn } = useAuth();
 
   const handleAuth = async () => {
@@ -25,12 +31,10 @@ export const LoginScreen = () => {
       Alert.alert('Error', 'Please enter email and password');
       return;
     }
-
     if (isSignUp && password !== confirmPassword) {
       Alert.alert('Error', 'Passwords do not match');
       return;
     }
-
     try {
       if (isSignUp) {
         await signUp(email, password);
@@ -51,177 +55,298 @@ export const LoginScreen = () => {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}
-    >
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.card}>
-          <Text style={styles.title}>{isSignUp ? 'Create Account' : 'Welcome Back'}</Text>
-          
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Email</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter your email"
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-            />
+    <View style={styles.container}>
+      <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
+      
+      {/* Dark Header Background */}
+      <View style={styles.headerBackground}>
+        <View style={styles.headerContent}>
+          <View style={styles.shieldOutline}>
+            <MaterialCommunityIcons name="shield-lock" size={42} color="white" />
           </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Password</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter your password"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-            />
-          </View>
-
-          {isSignUp && (
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Confirm Password</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Confirm your password"
-                value={confirmPassword}
-                onChangeText={setConfirmPassword}
-                secureTextEntry
-              />
-            </View>
-          )}
-
-          <TouchableOpacity style={styles.button} onPress={handleAuth}>
-            <Text style={styles.buttonText}>{isSignUp ? 'Sign Up' : 'Sign In'}</Text>
-          </TouchableOpacity>
-
-          <View style={styles.dividerContainer}>
-            <View style={styles.divider} />
-            <Text style={styles.dividerText}>OR</Text>
-            <View style={styles.divider} />
-          </View>
-
-          <TouchableOpacity
-            style={[styles.button, styles.googleButton]}
-            onPress={handleGoogleSignIn}
-          >
-            <Text style={styles.googleButtonText}>Sign In with Google</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={() => setIsSignUp(!isSignUp)}
-            style={styles.toggleContainer}
-          >
-            <Text style={styles.toggleText}>
-              {isSignUp
-                ? 'Already have an account? Sign In'
-                : "Don't have an account? Sign Up"}
-            </Text>
-          </TouchableOpacity>
+          <Text style={styles.brandTitle}>Project INTEGRITY</Text>
+          <Text style={styles.brandSubtitle}>CIVIC AUDIT PLATFORM</Text>
         </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+      </View>
+
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.flexOne}
+      >
+        <ScrollView 
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          bounces={false}
+        >
+          {/* Main White Card */}
+          <View style={styles.whiteCard}>
+            <Text style={styles.welcomeText}>
+              {isSignUp ? 'Create Account' : 'Welcome Back'}
+            </Text>
+            <Text style={styles.subWelcomeText}>
+              Secure access to civic infrastructure data.
+            </Text>
+
+            {/* Email Field */}
+            <View style={styles.inputContainer}>
+              <Text style={styles.inputLabel}>Email Address</Text>
+              <View style={styles.inputFieldWrapper}>
+                <TextInput
+                  style={styles.textInput}
+                  placeholder="name@example.com"
+                  placeholderTextColor="#94A3B8"
+                  value={email}
+                  onChangeText={setEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                />
+                <MaterialCommunityIcons name="email-outline" size={22} color="#94A3B8" />
+              </View>
+            </View>
+
+            {/* Password Field */}
+            <View style={styles.inputContainer}>
+              <View style={styles.passwordHeader}>
+                <Text style={styles.inputLabel}>Password</Text>
+                {!isSignUp && (
+                  <TouchableOpacity>
+                    <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+              <View style={styles.inputFieldWrapper}>
+                <TextInput
+                  style={styles.textInput}
+                  placeholder="••••••••"
+                  placeholderTextColor="#94A3B8"
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry={!showPassword}
+                />
+                <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                  <Ionicons 
+                    name={showPassword ? "eye-off-outline" : "eye-outline"} 
+                    size={22} 
+                    color="#94A3B8" 
+                  />
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {isSignUp && (
+              <View style={styles.inputContainer}>
+                <Text style={styles.inputLabel}>Confirm Password</Text>
+                <View style={styles.inputFieldWrapper}>
+                  <TextInput
+                    style={styles.textInput}
+                    placeholder="••••••••"
+                    placeholderTextColor="#94A3B8"
+                    value={confirmPassword}
+                    onChangeText={setConfirmPassword}
+                    secureTextEntry
+                  />
+                </View>
+              </View>
+            )}
+
+            {/* Login Button */}
+            <TouchableOpacity style={styles.mainButton} onPress={handleAuth}>
+              <Text style={styles.mainButtonText}>
+                {isSignUp ? 'Sign Up' : 'Login'}
+              </Text>
+            </TouchableOpacity>
+
+            {/* Divider */}
+            <View style={styles.dividerRow}>
+              <View style={styles.line} />
+              <Text style={styles.orText}>OR CONTINUE WITH</Text>
+              <View style={styles.line} />
+            </View>
+
+            {/* Google Button */}
+            <TouchableOpacity style={styles.googleBtn} onPress={handleGoogleSignIn}>
+              <Ionicons name="logo-google" size={18} color="#333" style={{ marginRight: 12 }} />
+              <Text style={styles.googleBtnText}>Continue with Google</Text>
+            </TouchableOpacity>
+
+            {/* Footer Toggle */}
+            <TouchableOpacity
+              onPress={() => setIsSignUp(!isSignUp)}
+              style={styles.footerLink}
+            >
+              <Text style={styles.footerText}>
+                {isSignUp ? 'Already have an account? ' : 'New to Integrity? '}
+                <Text style={styles.footerActionText}>
+                  {isSignUp ? 'Sign In' : 'Create an Account'}
+                </Text>
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </View>
   );
 };
-
-
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: '#162130', // Navy blue from header
+  },
+  flexOne: {
+    flex: 1,
+  },
+  headerBackground: {
+    height: 280,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  headerContent: {
+    alignItems: 'center',
+    marginTop: 40,
+  },
+  shieldOutline: {
+    width: 75,
+    height: 75,
+    borderRadius: 37.5,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  brandTitle: {
+    color: '#FFF',
+    fontSize: 22,
+    fontWeight: '800',
+    letterSpacing: 1.2,
+  },
+  brandSubtitle: {
+    color: '#94A3B8',
+    fontSize: 11,
+    fontWeight: '600',
+    letterSpacing: 2,
+    marginTop: 4,
   },
   scrollContent: {
     flexGrow: 1,
-    justifyContent: 'center',
-    padding: 20,
   },
-  card: {
-    backgroundColor: COLORS.white,
-    borderRadius: 20,
-    padding: 25,
-    shadowColor: COLORS.black,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    elevation: 5,
+  whiteCard: {
+    flex: 1,
+    backgroundColor: '#FFF',
+    borderTopLeftRadius: 35,
+    borderTopRightRadius: 35,
+    paddingHorizontal: 25,
+    paddingTop: 35,
+    paddingBottom: 40,
   },
-  title: {
-    fontSize: 28,
+  welcomeText: {
+    fontSize: 26,
     fontWeight: 'bold',
-    color: COLORS.black,
-    marginBottom: 30,
+    color: '#0F172A',
     textAlign: 'center',
   },
-  inputContainer: {
-    marginBottom: 20,
-  },
-  label: {
+  subWelcomeText: {
     fontSize: 14,
-    color: '#666',
+    color: '#64748B',
+    textAlign: 'center',
+    marginTop: 8,
+    marginBottom: 30,
+  },
+  inputContainer: {
+    marginBottom: 18,
+  },
+  passwordHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  inputLabel: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#1E293B',
     marginBottom: 8,
-    fontWeight: '500',
   },
-  input: {
-    backgroundColor: '#F9F9F9',
-    color: '#333',
-    borderRadius: 12,
-    padding: 15,
-    fontSize: 16,
+  forgotPasswordText: {
+    fontSize: 13,
+    color: '#10B981',
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  inputFieldWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#EEEEEE',
-  },
-  button: {
-    backgroundColor: COLORS.primary,
+    borderColor: '#E2E8F0',
     borderRadius: 12,
-    padding: 16,
+    paddingHorizontal: 15,
+    height: 52,
+  },
+  textInput: {
+    flex: 1,
+    fontSize: 15,
+    color: '#1E293B',
+  },
+  mainButton: {
+    backgroundColor: '#10B981',
+    borderRadius: 12,
+    height: 52,
+    justifyContent: 'center',
     alignItems: 'center',
     marginTop: 10,
+    // Add shadow for that "floating" look
+    shadowColor: '#10B981',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 4,
   },
-  buttonText: {
-    color: COLORS.white,
+  mainButtonText: {
+    color: '#FFF',
     fontSize: 16,
     fontWeight: 'bold',
   },
-  dividerContainer: {
+  dividerRow: {
     flexDirection: 'row',
     alignItems: 'center',
     marginVertical: 25,
   },
-  divider: {
+  line: {
     flex: 1,
     height: 1,
-    backgroundColor: '#EEEEEE',
+    backgroundColor: '#E2E8F0',
   },
-  dividerText: {
-    marginHorizontal: 15,
-    color: '#999',
-    fontWeight: 'bold',
+  orText: {
+    fontSize: 11,
+    color: '#94A3B8',
+    marginHorizontal: 10,
+    fontWeight: '700',
   },
-  googleButton: {
-    backgroundColor: COLORS.white,
+  googleBtn: {
+    flexDirection: 'row',
+    height: 52,
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#DDDDDD',
+    borderColor: '#E2E8F0',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  googleButtonText: {
-    color: COLORS.black,
-    fontSize: 16,
-    fontWeight: 'bold',
+  googleBtnText: {
+    color: '#1E293B',
+    fontSize: 15,
+    fontWeight: '600',
   },
-  toggleContainer: {
+  footerLink: {
     marginTop: 25,
     alignItems: 'center',
   },
-  toggleText: {
-    color: COLORS.primary,
+  footerText: {
     fontSize: 14,
-    fontWeight: '600',
+    color: '#64748B',
+  },
+  footerActionText: {
+    color: '#10B981',
+    fontWeight: 'bold',
   },
 });
